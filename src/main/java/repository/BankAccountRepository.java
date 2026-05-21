@@ -15,8 +15,6 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, UUID> 
 
     List<BankAccount> findByOwner(User owner);
 
-    List<BankAccount> findByOwnerId(UUID ownerId);
-
     Optional<BankAccount> findByAccountNumber(String accountNumber);
 
     boolean existsByAccountNumber(String accountNumber);

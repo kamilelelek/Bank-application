@@ -61,4 +61,5 @@ public class BankAccount {
     private void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
 }
