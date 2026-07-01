@@ -2,6 +2,9 @@ package service;
 
 import dto.account.AccountResponse;
 import dto.account.CreateAccountRequest;
+import exception.AccountNotFoundException;
+import exception.UnauthorizedAccountAccessException;
+import exception.UserNotFoundException;
 import model.AccountStatus;
 import model.BankAccount;
 import org.springframework.stereotype.Service;
@@ -23,7 +26,7 @@ public class AccountService {
     }
     public AccountResponse createAccount(CreateAccountRequest request, String email) {
         var user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         BankAccount bankAccount = BankAccount.builder()
                 .owner(user)
@@ -56,7 +59,7 @@ public class AccountService {
     }
     public List<AccountResponse> getMyAccounts(String email){
         var user=userRepository.findByEmail(email)
-                .orElseThrow(()-> new NullPointerException("User not found"));
+                .orElseThrow(()-> new UserNotFoundException("User not found"));
         return bankAccountRepository.findByOwner(user).stream()
                 .map(account -> new AccountResponse(
                         account.getId(),
@@ -71,9 +74,9 @@ public class AccountService {
     }
     public AccountResponse getAccountById (UUID id,String email){
         var account= bankAccountRepository.findById(id)
-                .orElseThrow(()-> new NullPointerException("User not found"));
+                .orElseThrow(()-> new AccountNotFoundException("User not found"));
         if(!account.getOwner().getEmail().equals(email)){
-            throw new IllegalArgumentException("Acces denied");
+            throw new UnauthorizedAccountAccessException("Acces denied");
         }
         return new AccountResponse(
                 account.getId(),
