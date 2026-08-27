@@ -3,6 +3,8 @@ package service;
 import dto.auth.AuthResponse;
 import dto.auth.LoginRequest;
 import dto.auth.RegisterRequest;
+import exception.UserAlreadyExistsException;
+import exception.UserNotFoundException;
 import model.Role;
 import model.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,10 +30,10 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new UserAlreadyExistsException("Email already exists");
         }
         if (userRepository.existsByPersonalIdNumber(request.personalIdNumber())) {
-            throw new IllegalArgumentException("Personal ID number already exists");
+            throw new UserAlreadyExistsException("Personal ID number already exists");
         }
         String hashedPassword = passwordEncoder.encode(request.password());
         User user = User.builder()
@@ -51,9 +53,9 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+                .orElseThrow(() -> new UserNotFoundException("Invalid email or password"));
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid email or password");
+            throw new UserAlreadyExistsException("Invalid email or password");
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtService.generateToken(userDetails);
