@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record TransactionResponse(UUID id,
-                                  String referenceId ,
+                                  String referenceId,
                                   BigDecimal amount,
                                   String currency,
                                   String title,
